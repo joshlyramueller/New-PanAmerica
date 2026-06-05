@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>New PanAmerica</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Source+Serif+4:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C96A;
+    --gold-pale: #F5E6B8;
+    --green-deep: #1A3A2A;
+    --green-mid: #2D5A3D;
+    --green-light: #4A7C5F;
+    --brown-dark: #3D2B1A;
+    --brown-mid: #6B4423;
+    --brown-light: #A0714A;
+    --cream: #F7F0E0;
+    --white: #FDFAF4;
+    --text-dark: #1A1208;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--green-deep);
+    color: var(--cream);
+    overflow-x: hidden;
+    cursor: default;
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ===== HAMBURGER NAV ===== */
+  .hamburger-btn {
+    position: fixed;
+    top: 24px;
+    right: 28px;
+    z-index: 900;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .hamburger-btn span {
+    display: block;
+    width: 32px;
+    height: 2px;
+    background: var(--gold);
+    transition: all 0.3s ease;
+    transform-origin: center;
+  }
+
+  .hamburger-btn.open span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+  .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+  .hamburger-btn.open span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+
+  .nav-logo {
+    position: fixed;
+    top: 24px;
+    left: 28px;
+    z-index: 900;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-decoration: none;
+    opacity: 0;
+    animation: fadeIn 1s 0.5s forwards;
+  }
+
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: -380px;
+    width: 340px;
+    height: 100vh;
+    background: var(--brown-dark);
+    z-index: 800;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 48px;
+    border-left: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .drawer.open { right: 0; }
+
+  .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 750;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .drawer-overlay.open { opacity: 1; pointer-events: all; }
+
+  .lang-switcher {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .lang-btn {
+    background: none;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold-light);
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .lang-btn.active, .lang-btn:hover {
+    background: var(--gold);
+    color: var(--brown-dark);
+    border-color: var(--gold);
+  }
+
+  .drawer nav { display: flex; flex-direction: column; gap: 8px; }
+
+  .drawer nav a {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.08em;
+    color: var(--cream);
+    text-decoration: none;
+    transition: color 0.2s, letter-spacing 0.2s;
+    line-height: 1.2;
+  }
+
+  .drawer nav a:hover { color: var(--gold); letter-spacing: 0.14em; }
+
+  .drawer-footer {
+    margin-top: auto;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    color: rgba(201,168,76,0.5);
+    text-transform: uppercase;
+  }
+
+  /* ===== HERO ===== */
+  #hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    position: relative;
+    overflow: hidden;
+    background: var(--green-deep);
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 50%, rgba(45,90,61,0.6) 0%, transparent 70%),
+      radial-gradient(ellipse 60% 80% at 85% 20%, rgba(61,43,26,0.7) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 60% 80%, rgba(201,168,76,0.08) 0%, transparent 50%);
+  }
+
+  .hero-grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 120px 8vw 60px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: slideUp 0.8s 0.3s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4.5rem, 12vw, 11rem);
+    line-height: 0.92;
+    letter-spacing: 0.02em;
+    color: var(--white);
+    margin-bottom: 12px;
+    opacity: 0;
+    animation: slideUp 0.9s 0.5s forwards;
+  }
+
+  .hero-title .accent { color: var(--gold); }
+
+  .hero-title-sub {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    letter-spacing: 0.06em;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: slideUp 0.9s 0.7s forwards;
+  }
+
+  .hero-tagline {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    font-style: italic;
+    color: var(--cream);
+    max-width: 580px;
+    line-height: 1.5;
+    opacity: 0;
+    animation: slideUp 0.9s 0.9s forwards;
+  }
+
+  .hero-stripe {
+    height: 6px;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--green-light) 40%, var(--brown-mid) 70%, var(--gold) 100%);
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s 1.5s forwards;
+    z-index: 10;
+  }
+
+  .hero-scroll-hint span {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.6);
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 48px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s infinite;
+  }
+
+  /* ===== SECTION BASE ===== */
+  .section {
+    position: relative;
+    padding: 100px 8vw;
+  }
+
+  .section-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 8rem;
+    color: rgba(201,168,76,0.06);
+    position: absolute;
+    top: 40px;
+    right: 8vw;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.8rem, 6vw, 5.5rem);
+    letter-spacing: 0.03em;
+    line-height: 0.95;
+    margin-bottom: 40px;
+    color: var(--white);
+  }
+
+  .section-title .gold { color: var(--gold); }
+
+  .section-body {
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    line-height: 1.8;
+    color: rgba(247,240,224,0.85);
+    max-width: 680px;
+  }
+
+  .section-body p + p { margin-top: 20px; }
+
+  /* ===== VISION SECTION ===== */
+  #vision {
+    background: var(--green-deep);
+    border-top: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .vision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    margin-top: 60px;
+  }
+
+  .vision-pillar {
+    border-top: 2px solid var(--gold);
+    padding-top: 28px;
+  }
+
+  .vision-pillar h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.06em;
+    color: var(--gold-light);
+    margin-bottom: 14px;
+  }
+
+  .vision-pillar p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: rgba(247,240,224,0.75);
+  }
+
+  /* ===== RAILWAY SECTION ===== */
+  #railway {
+    background: var(--brown-dark);
+  }
+
+  .railway-visual {
+    margin: 60px 0 40px;
+    position: relative;
+    height: 120px;
+    overflow: hidden;
+  }
+
+  .railway-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, transparent, var(--gold-light) 10%, var(--gold) 50%, var(--gold-light) 90%, transparent);
+    transform: translateY(-50%);
+  }
+
+  .railway-track::before, .railway-track::after {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: inherit;
+  }
+
+  .railway-track::after { top: 16px; }
+
+  .railway-sleepers {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 28px;
+    padding: 0 20px;
+  }
+
+  .sleeper {
+    flex-shrink: 0;
+    width: 8px;
+    height: 52px;
+    background: var(--brown-mid);
+    opacity: 0.8;
+  }
+
+  .railway-cities {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .city-stop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .city-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid var(--brown-dark);
+    box-shadow: 0 0 12px rgba(201,168,76,0.5);
+  }
+
+  .city-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    color: var(--gold-pale);
+    text-align: center;
+  }
+
+  /* ===== EXPAND SECTIONS ===== */
+  .expand-trigger {
+    margin-top: 48px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--gold);
+    font-family: 'Source Serif 4', serif;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    padding: 0;
+    transition: color 0.2s;
+  }
+
+  .expand-trigger:hover { color: var(--gold-light); }
+
+  .expand-icon {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s, background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .expand-trigger.active .expand-icon {
+    transform: rotate(45deg);
+    background: var(--gold);
+  }
+
+  .expand-trigger.active .expand-icon svg { stroke: var(--brown-dark); }
+
+  .expand-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .expand-content.open { max-height: 1200px; }
+
+  .expand-inner {
+    padding-top: 40px;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    margin-top: 40px;
+  }
+
+  .expand-inner p {
+    font-size: 1rem;
+    line-height: 1.85;
+    color: rgba(247,240,224,0.8);
+    max-width: 720px;
+    margin-bottom: 20px;
+  }
+
+  .expand-inner h4 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.06em;
+    color: var(--gold-light);
+    margin: 32px 0 12px;
+  }
+
+  /* ===== RWA SECTION ===== */
+  #rwa {
+    background: linear-gradient(160deg, var(--green-mid) 0%, var(--green-deep) 60%);
+  }
+
+  .rwa-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin: 60px 0;
+    background: rgba(201,168,76,0.1);
+  }
+
+  .rwa-stat {
+    background: rgba(26,58,42,0.9);
+    padding: 36px 28px;
+    text-align: center;
+  }
+
+  .rwa-stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.2rem;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .rwa-stat-label {
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(247,240,224,0.6);
+  }
+
+  .rwa-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 40px 0;
+    flex-wrap: wrap;
+  }
+
+  .rwa-step {
+    flex: 1;
+    min-width: 140px;
+    padding: 24px 20px;
+    background: rgba(45,90,61,0.3);
+    border: 1px solid rgba(201,168,76,0.15);
+    text-align: center;
+  }
+
+  .rwa-step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--gold);
+    opacity: 0.5;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .rwa-step-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.08em;
+    color: var(--cream);
+    margin-bottom: 6px;
+  }
+
+  .rwa-step-desc {
+    font-size: 0.78rem;
+    color: rgba(247,240,224,0.55);
+    line-height: 1.5;
+  }
+
+  .rwa-arrow {
+    font-size: 1.2rem;
+    color: var(--gold);
+    opacity: 0.4;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* ===== CARIBBEAN ===== */
+  #caribbean {
+    background: var(--brown-dark);
+    position: relative;
+  }
+
+  #caribbean::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 50% at 80% 50%, rgba(201,168,76,0.05) 0%, transparent 70%);
+  }
+
+  .caribbean-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2px;
+    margin-top: 60px;
+    background: rgba(201,168,76,0.08);
+  }
+
+  .caribbean-feature {
+    background: rgba(61,43,26,0.95);
+    padding: 40px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .caribbean-feature::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 0;
+    background: var(--gold);
+    transition: height 0.4s ease;
+  }
+
+  .caribbean-feature:hover::before { height: 100%; }
+
+  .feature-icon {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .feature-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.06em;
+    color: var(--gold-light);
+    margin-bottom: 12px;
+  }
+
+  .feature-desc {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: rgba(247,240,224,0.65);
+  }
+
+  /* ===== INFRASTRUCTURE ===== */
+  #infrastructure {
+    background: var(--green-deep);
+  }
+
+  .infra-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 60px;
+  }
+
+  .infra-card {
+    border: 1px solid rgba(201,168,76,0.15);
+    padding: 40px 36px;
+    position: relative;
+    transition: border-color 0.3s;
+  }
+
+  .infra-card:hover { border-color: rgba(201,168,76,0.4); }
+
+  .infra-card-accent {
+    position: absolute;
+    top: -1px;
+    left: 40px;
+    width: 60px;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .infra-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.06em;
+    color: var(--white);
+    margin-bottom: 16px;
+  }
+
+  .infra-card p {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: rgba(247,240,224,0.7);
+  }
+
+  /* ===== LITHIUM ===== */
+  #lithium {
+    background: var(--brown-dark);
+  }
+
+  .lithium-loop {
+    display: flex;
+    gap: 0;
+    margin: 60px 0;
+    position: relative;
+  }
+
+  .lithium-loop::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-light), transparent);
+    transform: translateY(-50%);
+    z-index: 0;
+  }
+
+  .loop-node {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .loop-dot {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--green-deep);
+    border: 2px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  .loop-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    color: var(--gold-pale);
+    text-align: center;
+    max-width: 100px;
+  }
+
+  /* ===== ABOUT ===== */
+  #about {
+    background: linear-gradient(160deg, var(--green-mid) 0%, var(--green-deep) 100%);
+    border-top: 1px solid rgba(201,168,76,0.15);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+    margin-top: 60px;
+    align-items: start;
+  }
+
+  .about-left {
+    border-top: 2px solid var(--gold);
+    padding-top: 28px;
+  }
+
+  .about-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    letter-spacing: 0.04em;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .about-title {
+    font-size: 0.82rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 28px;
+  }
+
+  .about-credentials {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .about-credentials li {
+    font-size: 0.85rem;
+    color: rgba(247,240,224,0.6);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .about-credentials li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    opacity: 0.5;
+  }
+
+  .about-right p {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: rgba(247,240,224,0.8);
+    margin-bottom: 24px;
+  }
+
+  .about-right p:first-child {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.3rem;
+    font-style: italic;
+    color: var(--cream);
+    line-height: 1.6;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: var(--text-dark);
+    padding: 48px 8vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
+    border-top: 3px solid var(--gold);
+  }
+
+  .footer-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 0.1em;
+    color: var(--gold);
+  }
+
+  .footer-copy {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    color: rgba(247,240,224,0.35);
+    text-transform: uppercase;
+  }
+
+  .footer-lang {
+    display: flex;
+    gap: 20px;
+  }
+
+  .footer-lang a {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(201,168,76,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-lang a:hover { color: var(--gold); }
+
+  /* ===== DIVIDER ===== */
+  .gold-divider {
+    width: 80px;
+    height: 2px;
+    background: var(--gold);
+    margin: 48px 0;
+  }
+
+  /* ===== QUOTE BLOCK ===== */
+  .pull-quote {
+    border-left: 4px solid var(--gold);
+    padding: 24px 32px;
+    margin: 48px 0;
+    background: rgba(201,168,76,0.05);
+  }
+
+  .pull-quote p {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+    font-style: italic;
+    color: var(--cream);
+    line-height: 1.5;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.1); }
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .vision-grid { grid-template-columns: 1fr; }
+    .rwa-stats { grid-template-columns: 1fr 1fr; }
+    .caribbean-features { grid-template-columns: 1fr; }
+    .infra-grid { grid-template-columns: 1fr; }
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+  }
+
+  @media (max-width: 600px) {
+    .section { padding: 70px 6vw; }
+    .rwa-stats { grid-template-columns: 1fr; }
+    .rwa-flow { flex-direction: column; }
+    .rwa-arrow { transform: rotate(90deg); }
+    .lithium-loop { flex-direction: column; gap: 24px; }
+    .lithium-loop::before { display: none; }
+    .railway-cities { gap: 20px; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV LOGO -->
+<a href="#hero" class="nav-logo">NPA</a>
+
+<!-- HAMBURGER -->
+<button class="hamburger-btn" id="hamburgerBtn" aria-label="Open menu">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- SIDE DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="lang-switcher">
+    <button class="lang-btn active" data-lang="en">EN</button>
+    <button class="lang-btn" data-lang="es">ES</button>
+    <button class="lang-btn" data-lang="pt">PT</button>
+  </div>
+  <nav>
+    <a href="#vision" onclick="closeDrawer()">Vision</a>
+    <a href="#railway" onclick="closeDrawer()">The Railway</a>
+    <a href="#rwa" onclick="closeDrawer()">RWA Platform</a>
+    <a href="#caribbean" onclick="closeDrawer()">Caribbean</a>
+    <a href="#infrastructure" onclick="closeDrawer()">Infrastructure</a>
+    <a href="#lithium" onclick="closeDrawer()">Lithium</a>
+    <a href="#about" onclick="closeDrawer()">About</a>
+  </nav>
+  <div class="drawer-footer">© 2026 New PanAmerica<br>Joshua Mueller</div>
+</div>
+
+<!-- ===== HERO ===== -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-lines"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" id="eyebrow-en">A Vision for the Western Hemisphere</div>
+    <div class="hero-eyebrow" id="eyebrow-es" style="display:none">Una Visión para el Hemisferio Occidental</div>
+    <div class="hero-eyebrow" id="eyebrow-pt" style="display:none">Uma Visão para o Hemisfério Ocidental</div>
+
+    <h1 class="hero-title">NEW<br><span class="accent">PAN</span><br>AMERICA</h1>
+
+    <div class="hero-title-sub" id="tagline-en">The Building of the New PanAmerican Dream</div>
+    <div class="hero-title-sub" id="tagline-es" style="display:none">La Construcción del Nuevo Sueño Panamericano</div>
+    <div class="hero-title-sub" id="tagline-pt" style="display:none">A Construção do Novo Sonho Pan-Americano</div>
+
+    <p class="hero-tagline" id="herotext-en">A unified, self-sustaining Western Hemisphere built on shared infrastructure, democratic investment, and the boundless natural wealth that belongs to all its people.</p>
+    <p class="hero-tagline" id="herotext-es" style="display:none">Un hemisferio occidental unificado y autosustentable, construido sobre infraestructura compartida, inversión democrática y la riqueza natural que pertenece a todos sus pueblos.</p>
+    <p class="hero-tagline" id="herotext-pt" style="display:none">Um hemisfério ocidental unificado e autossustentável, construído sobre infraestrutura compartilhada, investimento democrático e a riqueza natural que pertence a todos os seus povos.</p>
+  </div>
+  <div class="hero-stripe"></div>
+  <div class="hero-scroll-hint">
+    <span id="scroll-en">Scroll</span>
+    <span id="scroll-es" style="display:none">Desplazar</span>
+    <span id="scroll-pt" style="display:none">Rolar</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ===== VISION ===== -->
+<section id="vision" class="section">
+  <div class="section-number">01</div>
+  <div class="section-label">The Vision / La Visión / A Visão</div>
+  <h2 class="section-title">ONE HEMISPHERE.<br><span class="gold">ONE FUTURE.</span></h2>
+  <div class="section-body">
+    <p>New PanAmerica is a framework for hemispheric unity — not through empire or domination, but through shared infrastructure, democratic investment, and the radical idea that the western hemisphere possesses every resource it needs to become the most prosperous, self-sufficient region on Earth.</p>
+    <p>From Canada's technology corridors to Patagonia's wild frontier, from the Caribbean's sun-drenched shores to the lithium-rich Andes, this hemisphere is not a collection of struggling nations. It is a single, extraordinary civilization waiting to recognize itself.</p>
+  </div>
+
+  <div class="vision-grid">
+    <div class="vision-pillar">
+      <h3>Hemispheric Cohesion</h3>
+      <p>A voluntary union of western nations maintaining sovereign identity while building shared economic, legal, and infrastructure frameworks — modeled on what Europe achieved after its darkest chapter.</p>
+    </div>
+    <div class="vision-pillar">
+      <h3>Economic Independence</h3>
+      <p>Breaking dependency on external powers by developing the hemisphere's own supply chains — from lithium mines to battery factories, from grain fields to global markets — keeping wealth where it is created.</p>
+    </div>
+    <div class="vision-pillar">
+      <h3>Democratic Investment</h3>
+      <p>RWA tokenization that lets every citizen — regardless of wealth or geography — own a stake in the infrastructure of their own hemisphere. Democratizing investment. Democratizing prosperity.</p>
+    </div>
+    <div class="vision-pillar">
+      <h3>Radical Transparency</h3>
+      <p>Blockchain-recorded public spending on every infrastructure project — from bridge foundations to lithium processing plants — making corruption structurally impossible, not merely discouraged.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RAILWAY ===== -->
+<section id="railway" class="section">
+  <div class="section-number">02</div>
+  <div class="section-label">The Railway / El Ferrocarril / A Ferrovia</div>
+  <h2 class="section-title">THE PAN-AMERICAN<br><span class="gold">RAILWAY</span></h2>
+  <div class="section-body">
+    <p>A continental railway connecting Miami to Buenos Aires — carrying freight, passengers, and the idea of a unified Americas. Not a government project waiting for permission. A civilization-scale investment with commercial returns that justify every mile of track.</p>
+  </div>
+
+  <div class="railway-visual">
+    <div class="railway-track"></div>
+    <div class="railway-sleepers" id="sleepers"></div>
+  </div>
+
+  <div class="railway-cities">
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">MIAMI</div></div>
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">HAVANA</div></div>
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">CIUDAD DE MÉXICO</div></div>
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">GUATEMALA</div></div>
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">BOGOTÁ</div></div>
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">QUITO</div></div>
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">LIMA</div></div>
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">SANTIAGO</div></div>
+    <div class="city-stop"><div class="city-dot"></div><div class="city-name">BUENOS AIRES</div></div>
+  </div>
+
+  <div class="pull-quote" style="margin-top:48px">
+    <p>"A luxury land cruise through the most spectacular landscapes on Earth — the Andes at sunrise, the Amazon at dusk, the Pacific coast at golden hour — on a train that rivals any ocean liner."</p>
+  </div>
+
+  <button class="expand-trigger" onclick="toggleExpand('railway-expand', this)">
+    <span class="expand-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/>
+      </svg>
+    </span>
+    Read the full railway vision
+  </button>
+  <div class="expand-content" id="railway-expand">
+    <div class="expand-inner">
+      <h4>The Darién Solution</h4>
+      <p>The Darién Gap — the 100km stretch of jungle between Panama and Colombia that has stopped every road and rail project for a century — meets its match in an over-water coastal bypass. Rather than destroying one of Earth's most biodiverse ecosystems, New PanAmerica routes the railway along the Pacific coastline, bridging the shallow Gulf of Urabá and arriving in Colombia with the Darién intact as a preserved ecotourism wilderness.</p>
+      <h4>Lithium-Powered, Hemisphere-Built</h4>
+      <p>The railway runs on battery-electric and overhead-electric power, sourced from the hemisphere's own lithium deposits in Bolivia, Argentina, and Chile. The battery supply chain — from mine to cell to train — stays within the Americas, creating hundreds of thousands of manufacturing jobs in countries that currently export raw ore to be processed elsewhere.</p>
+      <h4>The Land Cruise</h4>
+      <p>Alongside freight and standard passenger service, the flagship product is the Pan-American Land Cruise — hotel-quality cabins, observation cars with floor-to-ceiling glass, rotating chefs showcasing regional cuisine at every stop. At Orient Express pricing across a two-week continental journey, each departure generates millions in revenue. The trains pay for the track. The track transforms the continent.</p>
+      <h4>The Río de la Plata Bridge</h4>
+      <p>At the southern end of the system, a combined road-rail bridge spanning the Río de la Plata connects Argentina and Uruguay — cutting 300km from the Buenos Aires to São Paulo route, completing the Bioceanic Corridor connecting Atlantic and Pacific ports, and generating a projected $5.5 billion surplus over its 80-year lifespan. Hydrokinetic turbines beneath its pillars power the crossing itself from the river's own current.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RWA ===== -->
+<section id="rwa" class="section">
+  <div class="section-number">03</div>
+  <div class="section-label">RWA Platform / Plataforma RWA / Plataforma RWA</div>
+  <h2 class="section-title">DEMOCRATIZE<br><span class="gold">THE BUILD</span></h2>
+  <div class="section-body">
+    <p>Real World Asset tokenization makes every citizen of the hemisphere a potential investor in its infrastructure. A bridge in Uruguay. A railway segment in Colombia. A solar station in the Atacama. A station district in Cartagena. Own it from your phone, for as little as one dollar.</p>
+  </div>
+
+  <div class="rwa-stats">
+    <div class="rwa-stat">
+      <div class="rwa-stat-number">$24B</div>
+      <div class="rwa-stat-label">RWA Market 2025</div>
+    </div>
+    <div class="rwa-stat">
+      <div class="rwa-stat-number">$18.9T</div>
+      <div class="rwa-stat-label">Projected by 2033</div>
+    </div>
+    <div class="rwa-stat">
+      <div class="rwa-stat-number">$1</div>
+      <div class="rwa-stat-label">Minimum Investment</div>
+    </div>
+  </div>
+
+  <div class="rwa-flow">
+    <div class="rwa-step">
+      <div class="rwa-step-num">01</div>
+      <div class="rwa-step-title">Asset Tokenized</div>
+      <div class="rwa-step-desc">Infrastructure asset divided into tokens on public blockchain</div>
+    </div>
+    <div class="rwa-arrow">→</div>
+    <div class="rwa-step">
+      <div class="rwa-step-num">02</div>
+      <div class="rwa-step-title">Public Invests</div>
+      <div class="rwa-step-desc">Any citizen buys tokens from $1 via mobile app</div>
+    </div>
+    <div class="rwa-arrow">→</div>
+    <div class="rwa-step">
+      <div class="rwa-step-num">03</div>
+      <div class="rwa-step-title">Smart Contract Builds</div>
+      <div class="rwa-step-desc">Funds held in escrow, released only on verified milestones</div>
+    </div>
+    <div class="rwa-arrow">→</div>
+    <div class="rwa-step">
+      <div class="rwa-step-num">04</div>
+      <div class="rwa-step-title">Revenue Distributes</div>
+      <div class="rwa-step-desc">Toll, fare and energy revenue flows automatically to holders</div>
+    </div>
+    <div class="rwa-arrow">→</div>
+    <div class="rwa-step">
+      <div class="rwa-step-num">05</div>
+      <div class="rwa-step-title">Full Transparency</div>
+      <div class="rwa-step-desc">Every dollar publicly recorded — corruption structurally impossible</div>
+    </div>
+  </div>
+
+  <button class="expand-trigger" onclick="toggleExpand('rwa-expand', this)">
+    <span class="expand-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/>
+      </svg>
+    </span>
+    How the system works in detail
+  </button>
+  <div class="expand-content" id="rwa-expand">
+    <div class="expand-inner">
+      <h4>Anti-Corruption by Architecture</h4>
+      <p>Contractor payments don't release when a government official signs off. They release when satellite imagery, IoT sensors embedded in the infrastructure, and licensed independent inspectors all confirm completion simultaneously. Falsifying a cryptographically signed on-chain attestation creates permanent, irrefutable evidence of fraud. Corruption requires opacity. This system makes opacity structurally impossible.</p>
+      <h4>Local Priority Allocation</h4>
+      <p>When a railway segment is built through Colombia, Colombian citizens receive first access to tokens at the initial offering price. Workers building the infrastructure can receive partial compensation in tokens — giving them lifetime equity in the asset they built. A Bolivian construction worker owns a stake in the tunnel he spent two years building.</p>
+      <h4>The Regulatory Foundation</h4>
+      <p>The 2025 GENIUS Act established federal framework for payment stablecoins and cleared the regulatory path for exactly this type of infrastructure token system. The legal foundation exists today. New PanAmerica builds on it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CARIBBEAN ===== -->
+<section id="caribbean" class="section">
+  <div class="section-number">04</div>
+  <div class="section-label">Caribbean Economy / Economía Caribeña / Economia Caribenha</div>
+  <h2 class="section-title">THE LUXURY<br><span class="gold">CARIBBEAN</span></h2>
+  <div class="section-body">
+    <p>The Caribbean possesses the most extraordinary natural tourism assets on Earth — and has systematically underperformed them due to infrastructure gaps and instability. New PanAmerica transforms the Caribbean from a collection of struggling island economies into the hemisphere's premier luxury destination. Not another Cancún. A genuinely world-class experience where local communities own the wealth their islands generate.</p>
+  </div>
+
+  <div class="caribbean-features">
+    <div class="caribbean-feature">
+      <span class="feature-icon">🌊</span>
+      <div class="feature-title">World-Class Tourism Infrastructure</div>
+      <p class="feature-desc">Boutique hotels, marina systems, cultural centers and waterfront developments financed through RWA tokens — owned by local communities, not foreign chains.</p>
+    </div>
+    <div class="caribbean-feature">
+      <span class="feature-icon">⚓</span>
+      <div class="feature-title">Rail and Ferry Network</div>
+      <p class="feature-desc">A seamless premium ferry and rail network connecting Caribbean islands and linking to the continental railway via Trinidad-Venezuela — one ticket, one continuous experience.</p>
+    </div>
+    <div class="caribbean-feature">
+      <span class="feature-icon">🏛️</span>
+      <div class="feature-title">Cultural Economy</div>
+      <p class="feature-desc">Caribbean music, food, art, and history elevated as global cultural exports — the hemisphere's most distinctive identity marketed to the world on its own terms.</p>
+    </div>
+    <div class="caribbean-feature">
+      <span class="feature-icon">☀️</span>
+      <div class="feature-title">Renewable Energy Independence</div>
+      <p class="feature-desc">Solar, wind, and tidal energy systems ending the Caribbean's dependence on imported diesel — lowering costs, reducing emissions, and creating local energy sovereignty.</p>
+    </div>
+    <div class="caribbean-feature">
+      <span class="feature-icon">💰</span>
+      <div class="feature-title">Financial Hub</div>
+      <p class="feature-desc">Pan-American RWA trading infrastructure based in the Caribbean — following the Dubai and Singapore model of creating financial services economies around strategic geographic positions.</p>
+    </div>
+    <div class="caribbean-feature">
+      <span class="feature-icon">🌿</span>
+      <div class="feature-title">Eco-Tourism Premium</div>
+      <p class="feature-desc">The Caribbean's coral reefs, rainforests, and marine ecosystems monetized sustainably — making conservation economically rational rather than economically painful.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== INFRASTRUCTURE ===== -->
+<section id="infrastructure" class="section">
+  <div class="section-number">05</div>
+  <div class="section-label">Infrastructure & Energy / Infraestructura y Energía / Infraestrutura e Energia</div>
+  <h2 class="section-title">BUILD IT<br><span class="gold">CLEAN</span></h2>
+  <div class="section-body">
+    <p>Every infrastructure project in the New PanAmerica framework is financed transparently, built to environmental standards, and powered by the hemisphere's own renewable resources. From the Río de la Plata bridge to Andean rail tunnels — the hemisphere builds with the future it wants to inhabit.</p>
+  </div>
+
+  <div class="infra-grid">
+    <div class="infra-card">
+      <div class="infra-card-accent"></div>
+      <h3>Río de la Plata Bridge</h3>
+      <p>A combined road-rail bridge connecting Argentina and Uruguay — the southern anchor of the continental railway system. Hydrokinetic turbines beneath its pillars harness river current, solar panels line its deck, and Pampero wind turbines complete a self-powering structure at continental scale.</p>
+    </div>
+    <div class="infra-card">
+      <div class="infra-card-accent"></div>
+      <h3>Darién Coastal Bypass</h3>
+      <p>An over-water coastal railway bypass preserving the Darién Gap wilderness as one of Earth's most biodiverse ecosystems — connecting North and South America without destroying the natural heritage that makes the hemisphere extraordinary.</p>
+    </div>
+    <div class="infra-card">
+      <div class="infra-card-accent"></div>
+      <h3>Andean Tunnel System</h3>
+      <p>High-altitude rail tunnels through the Andes connecting the Pacific and Atlantic coasts — completing the Bioceanic Corridor that lets South American goods reach both oceans without the Panama Canal or Cape Horn.</p>
+    </div>
+    <div class="infra-card">
+      <div class="infra-card-accent"></div>
+      <h3>Hemispheric Energy Grid</h3>
+      <p>Solar generation in the Atacama, hydroelectric from the Amazon basin, wind from Patagonia and the Caribbean — connected through a hemispheric transmission network that gives every nation access to the full spectrum of the Americas' renewable wealth.</p>
+    </div>
+  </div>
+
+  <button class="expand-trigger" onclick="toggleExpand('infra-expand', this)" style="margin-top:48px">
+    <span class="expand-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/>
+      </svg>
+    </span>
+    The hydrokinetic bridge in detail
+  </button>
+  <div class="expand-content" id="infra-expand">
+    <div class="expand-inner">
+      <h4>A Bridge That Powers Itself</h4>
+      <p>The Río de la Plata crossing doesn't just connect Argentina and Uruguay — it generates its own power from three simultaneous sources. Hydrokinetic turbines positioned at every bridge pillar exploit the natural current acceleration effect, generating continuous baseload power 90% of the time. Solar panels integrated into the bridge deck and railing structure provide daytime peak generation. Vertical axis wind turbines capture the Pampero winds that blow consistently across the estuary.</p>
+      <p>Conservative estimates suggest 100MW of continuous generation capacity — enough to power the railway operations crossing it with surplus feeding both national grids. The bridge doesn't just pay for itself in tolls. It pays for itself in energy.</p>
+      <h4>Environmental Design</h4>
+      <p>The La Plata river dolphin — one of the world's rarest cetaceans — and the estuary's fisheries are protected through deliberate corridor design. Turbine arrays are concentrated in high-flow channels while biological migration corridors remain open. Modern slow-rotation hydrokinetic turbines are engineered specifically to deflect marine life rather than entrain it. The bridge enhances the estuary's renewable energy economy without degrading the ecosystem it spans.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LITHIUM ===== -->
+<section id="lithium" class="section">
+  <div class="section-number">06</div>
+  <div class="section-label">Lithium & Manufacturing / Litio y Manufactura / Lítio e Manufatura</div>
+  <h2 class="section-title">THE CLOSED<br><span class="gold">LOOP</span></h2>
+  <div class="section-body">
+    <p>The western hemisphere sits on 60% of global lithium reserves — the critical material for every electric vehicle and battery system powering the energy transition. Right now, that lithium is shipped to China for processing and returned as finished batteries at enormous markup. New PanAmerica closes that loop permanently.</p>
+  </div>
+
+  <div class="lithium-loop">
+    <div class="loop-node">
+      <div class="loop-dot">⛏</div>
+      <div class="loop-label">MINE IN BOLIVIA CHILE ARGENTINA</div>
+    </div>
+    <div class="loop-node">
+      <div class="loop-dot">⚗️</div>
+      <div class="loop-label">PROCESS IN-HEMISPHERE</div>
+    </div>
+    <div class="loop-node">
+      <div class="loop-dot">🔋</div>
+      <div class="loop-label">MANUFACTURE BATTERIES IN BRAZIL</div>
+    </div>
+    <div class="loop-node">
+      <div class="loop-dot">🚂</div>
+      <div class="loop-label">POWER THE RAILWAY</div>
+    </div>
+    <div class="loop-node">
+      <div class="loop-dot">🚗</div>
+      <div class="loop-label">BUILD HEMISPHERE CARS AND TRAINS</div>
+    </div>
+    <div class="loop-node">
+      <div class="loop-dot">📤</div>
+      <div class="loop-label">EXPORT SURPLUS TO THE WORLD</div>
+    </div>
+  </div>
+
+  <div class="gold-divider"></div>
+
+  <div class="section-body">
+    <p>Argentina's lithium production is set to increase five-fold by 2025, potentially adding 1% to GDP from raw extraction alone. Under New PanAmerica's manufacturing framework — where battery cells are produced domestically, train cars are assembled in Brazil, and electric vehicles roll off hemispheric assembly lines — that percentage multiplies dramatically. The hemisphere becomes the world's supplier of the technology that powers the clean energy transition, rather than its raw material donor.</p>
+  </div>
+
+  <button class="expand-trigger" onclick="toggleExpand('lithium-expand', this)">
+    <span class="expand-icon">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="7" y1="2" x2="7" y2="12"/><line x1="2" y1="7" x2="12" y2="7"/>
+      </svg>
+    </span>
+    Indigenous rights and environmental framework
+  </button>
+  <div class="expand-content" id="lithium-expand">
+    <div class="expand-inner">
+      <h4>Community Ownership First</h4>
+      <p>The Atacama salt flats — the source of Chile and Argentina's lithium — are the ancestral territory of Atacameño and Aymara communities who depend on the same water sources that lithium extraction threatens. New PanAmerica's framework makes indigenous governance rights, revenue sharing, and environmental protection foundational design principles, not concessions extracted through protest.</p>
+      <p>Blockchain-tracked revenue distribution ensures lithium royalties flow directly and transparently to the communities whose land generates them. RWA tokens give those communities equity ownership in the processing and manufacturing facilities built with their resource — so they don't just receive payments, they own a share of the downstream value chain.</p>
+      <h4>The China Alternative</h4>
+      <p>Bolivia signed a $1 billion agreement with a Chinese consortium in 2025 — and public outrage erupted immediately. The hemisphere wants a different partner for lithium development. New PanAmerica is that offer: genuine profit-sharing, local manufacturing, environmental standards, and hemispheric ownership of the supply chain rather than dependency on Beijing's processing monopoly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about" class="section">
+  <div class="section-number">07</div>
+  <div class="section-label">The Visionary / El Visionario / O Visionário</div>
+  <h2 class="section-title">THE VISION<br><span class="gold">HAS AN AUTHOR</span></h2>
+
+  <div class="about-grid">
+    <div class="about-left">
+      <div class="about-name">Joshua Mueller</div>
+      <div class="about-title">Artist & Visionary</div>
+      <ul class="about-credentials">
+        <li>BFA Digital Art, University of West Florida, 2026</li>
+        <li>MS Candidate, Florida Interactive Entertainment Academy, UCF</li>
+        <li>3D Sculptor, Game Designer, Digital Fabricator</li>
+        <li>Specialist in Blender, ZBrush, Unreal Engine 5</li>
+        <li>Originator of the New PanAmerica Framework, 2026</li>
+      </ul>
+    </div>
+    <div class="about-right">
+      <p>"I arrived at this vision not as a politician or economist but as an artist — someone who believes that the most powerful political arguments are not made in white papers but in objects, images, and experiences that make the future feel real before it exists."</p>
+      <p>Joshua Mueller is a digital artist, sculptor, and game designer whose practice spans 3D sculpture, interactive media, and world-building. His large-scale 3D sculptures explore hemispheric identity, economic justice, and the visual language of an Americas that has not yet realized its own potential.</p>
+      <p>New PanAmerica is the intellectual framework that unifies his artistic and entrepreneurial vision — a detailed, evidence-based, politically serious proposal for western hemispheric cohesion, dressed not in the language of policy but in the visual language of what this hemisphere could become. The railway. The bridge. The lithium loop. The Caribbean transformed. These are not campaign promises. They are architectural renderings of a possible world.</p>
+      <p>Mueller's work argues that the western hemisphere possesses every resource — lithium, arable land, renewable energy, young populations, extraordinary natural beauty — to be the most prosperous and self-sufficient region on Earth. The missing ingredient is not capital or technology. It is a vision compelling enough to pull serious people toward it. That is what an artist is for.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-brand">NEW PANAMERICA</div>
+  <div class="footer-copy">© 2026 Joshua Mueller · All Rights Reserved · Founding Framework Document</div>
+  <div class="footer-lang">
+    <a href="#" onclick="setLang('en'); return false;">EN</a>
+    <a href="#" onclick="setLang('es'); return false;">ES</a>
+    <a href="#" onclick="setLang('pt'); return false;">PT</a>
+  </div>
+</footer>
+
+<script>
+  // Generate sleepers
+  const sleepersEl = document.getElementById('sleepers');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'sleeper';
+    sleepersEl.appendChild(s);
+  }
+
+  // Hamburger / Drawer
+  const btn = document.getElementById('hamburgerBtn');
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+
+  btn.addEventListener('click', () => {
+    btn.classList.toggle('open');
+    drawer.classList.toggle('open');
+    overlay.classList.toggle('open');
+  });
+
+  overlay.addEventListener('click', closeDrawer);
+
+  function closeDrawer() {
+    btn.classList.remove('open');
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+
+  // Expand/collapse
+  function toggleExpand(id, trigger) {
+    const content = document.getElementById(id);
+    const isOpen = content.classList.contains('open');
+    content.classList.toggle('open');
+    trigger.classList.toggle('active');
+  }
+
+  // Language switching
+  const langGroups = {
+    en: ['eyebrow-en','tagline-en','herotext-en','scroll-en'],
+    es: ['eyebrow-es','tagline-es','herotext-es','scroll-es'],
+    pt: ['eyebrow-pt','tagline-pt','herotext-pt','scroll-pt']
+  };
+
+  let currentLang = 'en';
+
+  function setLang(lang) {
+    // Hide all
+    Object.values(langGroups).flat().forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    // Show selected
+    langGroups[lang].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = '';
+    });
+    // Update buttons
+    document.querySelectorAll('.lang-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.lang === lang);
+    });
+    currentLang = lang;
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => setLang(btn.dataset.lang));
+  });
+
+  // Scroll-triggered fade-in for sections
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.vision-pillar, .infra-card, .caribbean-feature, .rwa-step, .loop-node').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
