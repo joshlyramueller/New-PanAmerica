@@ -19,6 +19,7 @@
     --cream: #F7F0E0;
     --white: #FDFAF4;
     --text-dark: #1A1208;
+    --teal:#7ECBA8;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -373,12 +374,59 @@
   #railway {
     background: var(--brown-dark);
   }
+  .map-outer{position:fixed;top:54px;left:0;right:0;bottom:0;overflow:hidden;background:var(--green-deep);cursor:grab;}
+  .map-outer.grabbing{cursor:grabbing;}
+  .map-inner{position:absolute;top:0;left:0;transform-origin:0 0;}
+  .map-img{display:block;}
+  .map-svg{position:absolute;top:0;left:0;pointer-events:none;}
+  .markers-layer{position:absolute;top:0;left:0;}
 
-  .railway-visual {
-    margin: 60px 0 40px;
-    position: relative;
-    height: 120px;
-    overflow: hidden;
+  .marker{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:10;pointer-events:all;}
+  .marker-dot{width:12px;height:12px;border-radius:50%;background:var(--brown-dark);border:2px solid var(--gold);box-shadow:0 0 10px rgba(201,168,76,0.5);transition:transform 0.2s,background 0.2s,box-shadow 0.2s;}
+  .marker.hub .marker-dot{width:15px;height:15px;border-width:2.5px;box-shadow:0 0 14px rgba(201,168,76,0.65);}
+  .marker:hover .marker-dot,.marker.active .marker-dot{background:var(--gold);transform:scale(1.4);box-shadow:0 0 18px rgba(201,168,76,0.9);}
+  .marker-label{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:0.08em;color:rgba(247,240,224,0.8);white-space:nowrap;pointer-events:none;text-shadow:0 1px 3px rgba(0,0,0,0.8),0 0 6px rgba(0,0,0,0.6);}
+    .railway-visual {
+      margin: 60px 0 40px;
+      position: relative;
+      height: 120px;
+      overflow: hidden;
+
+        .zoom-wrap{position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:3px;}
+  .z-btn{width:34px;height:34px;background:rgba(26,42,35,0.95);border:1px solid rgba(201,168,76,0.25);color:var(--gold);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;font-family:monospace;}
+  .z-btn:hover{background:rgba(201,168,76,0.15);}
+  .z-fit{font-size:0.6rem;font-family:'Source Serif 4',serif;letter-spacing:0.05em;}
+
+  .popup{position:fixed;z-index:400;width:310px;background:rgba(18,36,26,0.98);border:1px solid rgba(201,168,76,0.35);box-shadow:0 16px 48px rgba(0,0,0,0.75);display:none;}
+  .popup.open{display:block;}
+  .pop-head{background:linear-gradient(135deg,rgba(45,90,61,0.65),rgba(61,43,26,0.45));border-bottom:1px solid rgba(201,168,76,0.15);padding:14px 18px 12px;position:relative;}
+  .pop-x{position:absolute;top:9px;right:11px;background:none;border:none;color:var(--gold);font-size:1rem;cursor:pointer;padding:4px;line-height:1;}
+  .pop-x:hover{color:var(--gold-light);}
+  .pop-badge{font-size:0.57rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:2px;}
+  .pop-city{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:0.04em;color:var(--white);line-height:1;margin-bottom:3px;}
+  .pop-tag{font-family:'Playfair Display',serif;font-style:italic;font-size:0.76rem;color:rgba(247,240,224,0.58);line-height:1.35;padding-right:20px;}
+  .pop-tabs{display:flex;border-bottom:1px solid rgba(201,168,76,0.1);}
+  .p-tab{flex:1;padding:8px 4px;font-size:0.6rem;letter-spacing:0.14em;text-transform:uppercase;text-align:center;cursor:pointer;color:rgba(247,240,224,0.38);border:none;border-bottom:2px solid transparent;background:none;font-family:'Source Serif 4',serif;transition:all 0.15s;}
+  .p-tab.on{color:var(--gold);border-bottom-color:var(--gold);background:rgba(201,168,76,0.04);}
+  .p-tab:hover:not(.on){color:rgba(247,240,224,0.62);}
+  .pop-body{padding:13px 18px 15px;min-height:105px;}
+  .p-panel{display:none;}
+  .p-panel.on{display:block;}
+  .p-sec{font-size:0.59rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .p-sec::after{content:'';flex:1;height:1px;background:rgba(201,168,76,0.18);}
+  .p-txt{font-size:0.81rem;line-height:1.65;color:rgba(247,240,224,0.74);margin-bottom:8px;}
+  .p-list{list-style:none;display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+  .p-list li{font-size:0.76rem;color:rgba(247,240,224,0.58);padding-left:12px;position:relative;line-height:1.38;}
+  .p-list li::before{content:'◆';position:absolute;left:0;color:var(--gold);font-size:0.4rem;top:4px;}
+  .p-stats{display:flex;gap:7px;margin-top:7px;}
+  .p-stat{flex:1;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.13);padding:7px 9px;text-align:center;}
+  .p-stat-n{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;color:var(--gold);line-height:1;}
+  .p-stat-l{font-size:0.57rem;letter-spacing:0.08em;text-transform:uppercase;color:rgba(247,240,224,0.38);margin-top:2px;line-height:1.3;}
+
+  #loadMsg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:0.15em;color:var(--gold);z-index:500;display:none;}
+
+  @media(max-width:600px){.h-legend,.sidebar{display:none;}.popup{width:270px;}.marker-label{display:none;}}
+      
   }
 
   .railway-track {
@@ -1047,6 +1095,231 @@
     <div class="railway-sleepers" id="sleepers"></div>
   </div>
 
+  <body>
+
+<div class="header">
+  <div class="h-left">
+    <a href="newpanamerica.html" class="h-brand">NEW PANAMERICA</a>
+    <div class="h-sep"></div>
+    <div class="h-sub">The Continental Railway</div>
+  </div>
+  <div class="h-legend">
+    <div class="leg"><div class="leg-line" style="background:#C9A84C"></div>Main Corridor</div>
+    <div class="leg"><div class="leg-line" style="background:none;border-top:3px dashed #C9A84C;height:0;width:22px"></div>Darién Bypass</div>
+    <div class="leg"><div class="leg-line" style="background:none;border-top:2px dashed #7ECBA8;height:0;opacity:0.75"></div>Ferry Link</div>
+    <div class="leg"><div class="leg-dot"></div>Station</div>
+  </div>
+</div>
+
+<div class="map-outer" id="outer">
+  <div class="map-inner" id="inner">
+    <img class="map-img" id="mapImg" src="npa-map.png" alt="Western Hemisphere"/>
+    <svg class="map-svg" id="routeSvg" xmlns="http://www.w3.org/2000/svg"><g id="rg"></g></svg>
+    <div class="markers-layer" id="ml"></div>
+  </div>
+</div>
+
+<div id="loadMsg">Loading map...</div>
+
+<div class="sidebar">
+  <div class="sb-title">Railway Overview</div>
+  <div class="sb-row"><span class="sb-l">Total Distance</span><span class="sb-v">~28,000 km</span></div>
+  <div class="sb-row"><span class="sb-l">Nations Served</span><span class="sb-v">17 Countries</span></div>
+  <div class="sb-row"><span class="sb-l">Major Stations</span><span class="sb-v">30+ Stops</span></div>
+  <div class="sb-row"><span class="sb-l">Power Source</span><span class="sb-v">Hemispheric Lithium</span></div>
+  <div class="sb-row"><span class="sb-l">Flagship</span><span class="sb-v">Land Cruise</span></div>
+</div>
+
+<div class="zoom-wrap">
+  <button class="z-btn" id="zIn">+</button>
+  <button class="z-btn" id="zOut">−</button>
+  <button class="z-btn z-fit" id="zFit">FIT</button>
+</div>
+
+<div class="popup" id="popup">
+  <div class="pop-head">
+    <button class="pop-x" id="popX">✕</button>
+    <div class="pop-badge" id="pBadge"></div>
+    <div class="pop-city" id="pCity"></div>
+    <div class="pop-tag" id="pTag"></div>
+  </div>
+  <div class="pop-tabs">
+    <button class="p-tab on" id="tTour" onclick="showTab(0)">Tourism</button>
+    <button class="p-tab" id="tEcon" onclick="showTab(1)">Economy</button>
+  </div>
+  <div class="pop-body">
+    <div class="p-panel on" id="pTour">
+      <div class="p-sec">Highlights</div>
+      <p class="p-txt" id="pTourTxt"></p>
+      <ul class="p-list" id="pTourList"></ul>
+    </div>
+    <div class="p-panel" id="pEcon">
+      <div class="p-sec">Economic Impact</div>
+      <p class="p-txt" id="pEconTxt"></p>
+      <ul class="p-list" id="pEconList"></ul>
+      <div class="p-stats">
+        <div class="p-stat"><div class="p-stat-n" id="pS1n"></div><div class="p-stat-l" id="pS1l"></div></div>
+        <div class="p-stat"><div class="p-stat-n" id="pS2n"></div><div class="p-stat-l" id="pS2l"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var S=[
+  {id:0,x:39.53,y:35.16,hub:1,name:"Miami",country:"USA",tag:"Gateway to the Americas",tour:"Art Basel, Wynwood murals, Pérez Art Museum, and the world's most diverse culinary scene. First or last stop on the most extraordinary railway journey on Earth.",th:["Art Basel Miami Beach","Everglades eco-tours","Little Havana cultural district","South Beach Architecture Walk"],econ:"Miami is the financial capital of Latin America and the primary RWA platform headquarters for New PanAmerica.",eh:["Hemispheric financial hub","RWA platform HQ","Caribbean trade gateway","Inter-American commerce center"],s1:"$51B",sl1:"Annual Trade Value",s2:"40M",sl2:"Annual Visitors"},
+  {id:1,x:43.01,y:28.81,hub:1,name:"Washington D.C.",country:"USA",tag:"Where the Vision Becomes Policy",tour:"The National Mall, Smithsonian museums, and the monuments of American history. Where New PanAmerica's political architecture meets the public.",th:["Smithsonian National Museums","National Mall & Monuments","Georgetown waterfront","National Gallery of Art"],econ:"Home to the State Department, USAID, and the Development Finance Corporation that funds hemispheric infrastructure.",eh:["State Department & diplomacy","Congressional advocacy access","Development Finance Corp","Think tank district"],s1:"$600B",sl1:"Metro GDP",s2:"24M",sl2:"Annual Visitors"},
+  {id:2,x:44.29,y:25.39,hub:1,name:"New York",country:"USA",tag:"Capital of the World",tour:"The Metropolitan Museum, Central Park, the High Line, Broadway, and five boroughs of extraordinary cultural depth.",th:["Museum Mile","World Trade Center","Brooklyn Bridge","Broadway Theater District"],econ:"Wall Street and the UN connect hemispheric RWA investment to global capital markets.",eh:["Global capital markets","UN headquarters diplomacy","Latin American diaspora","Cultural IP export hub"],s1:"$2T",sl1:"Metro GDP",s2:"67M",sl2:"Annual Visitors"},
+  {id:3,x:38.80,y:24.90,hub:0,name:"Chicago",country:"USA",tag:"America's Freight Backbone",tour:"The Art Institute, Millennium Park, Chicago Riverwalk, deep-dish pizza, and the most extraordinary skyline on the continent.",th:["Art Institute of Chicago","Millennium Park & Cloud Gate","Architecture River Cruise","Blues & Jazz scene"],econ:"Seven of North America's major freight rail networks converge in Chicago — the primary interchange node between the hemispheric system and North American infrastructure.",eh:["Freight interchange capital","BNSF & UP rail integration","Manufacturing supply chain hub","Midwest agricultural gateway"],s1:"$770B",sl1:"Metro GDP",s2:"55M",sl2:"Annual Visitors"},
+  {id:4,x:31.84,y:29.30,hub:0,name:"Los Angeles",country:"USA",tag:"Pacific Gateway & Cultural Engine",tour:"Hollywood, Getty Museum, beaches of Malibu and Santa Monica, world-class dining, and the most important cultural production center on Earth.",th:["Hollywood & entertainment industry","Getty Center & LACMA","Santa Monica & Venice Beach","Griffith Observatory"],econ:"The Port of LA — busiest in North America — becomes the Pacific terminus of the hemispheric freight corridor.",eh:["Port of LA freight terminus","Entertainment IP export","Pacific trade gateway","Nearshoring supply chain hub"],s1:"$1.1T",sl1:"Metro GDP",s2:"50M",sl2:"Annual Visitors"},
+  {id:5,x:35.14,y:37.11,hub:1,name:"Mexico City",country:"Mexico",tag:"Cultural Heart of the Americas",tour:"Teotihuacan pyramids, Frida Kahlo Museum, National Museum of Anthropology, and world-class cuisine in one of Earth's greatest cities.",th:["Teotihuacan Pyramids","National Museum of Anthropology","Frida Kahlo Museum","Historic Centro & Zócalo"],econ:"The largest Spanish-speaking city on Earth. Mexico City anchors Central American development and serves as the political hub for hemispheric integration.",eh:["Largest Spanish-speaking city","Central American financial hub","Cultural IP production capital","Diplomatic nexus for USMCA+"],s1:"$450B",sl1:"Metro GDP",s2:"13M",sl2:"Annual Visitors"},
+  {id:6,x:36.24,y:38.09,hub:0,name:"Belize City",country:"Belize",tag:"Taiwan's Semiconductor Partner",tour:"The Belize Barrier Reef, the Blue Hole UNESCO World Heritage site, Mayan ruins at Caracol, and Caribbean island cayes.",th:["Blue Hole UNESCO World Heritage","Belize Barrier Reef diving","Caracol Mayan ruins","Ambergris Caye islands"],econ:"Belize's 35-year Taiwan diplomatic partnership positions it as the natural location for hemispheric semiconductor manufacturing.",eh:["Taiwan semiconductor manufacturing hub","English-speaking tech workforce","IDB-Taiwan investment partnership","Barrier Reef eco-tourism economy"],s1:"35 yrs",sl1:"Taiwan Partnership",s2:"450K",sl2:"Population — Max Impact"},
+  {id:7,x:35.69,y:39.06,hub:0,name:"Guatemala City",country:"Guatemala",tag:"Gateway to Mayan Civilization",tour:"Tikal's jungle pyramid complex, Antigua Guatemala's colonial splendor, Lake Atitlán's volcanic shores, and living Mayan culture.",th:["Tikal National Park & Mayan ruins","Antigua Guatemala colonial city","Lake Atitlán & volcano hikes","Chichicastenango market"],econ:"Primary Central American railway employment zone — creating tens of thousands of jobs in the hemisphere's highest cartel recruitment vulnerability area.",eh:["High-impact railway employment zone","Textile & agricultural export corridor","Antigua luxury tourism development","Mayan heritage cultural economy"],s1:"$85B",sl1:"GDP",s2:"1.8M",sl2:"Annual Visitors"},
+  {id:8,x:36.05,y:40.04,hub:0,name:"San Salvador",country:"El Salvador",tag:"The Bitcoin Beach Nation",tour:"El Salvador's dramatic Pacific coast, Ruta de las Flores mountain villages, Mayan ruins at Tazumal, and the surfing beaches of La Libertad.",th:["El Tunco Pacific surf beaches","Ruta de las Flores villages","Tazumal Mayan ruins","Coatepeque lake crater"],econ:"El Salvador's Bitcoin legal tender status makes it the hemisphere's most crypto-ready population — a natural early adopter for RWA infrastructure tokens.",eh:["Bitcoin & crypto-ready population","RWA token early adoption market","Gang recruitment counter-programming","Pacific export corridor"],s1:"70%",sl1:"Crime Reduction Since 2022",s2:"3M",sl2:"Annual Visitors"},
+  {id:9,x:36.79,y:41.89,hub:0,name:"San José",country:"Costa Rica",tag:"Eco-Tourism Capital of the World",tour:"Manuel Antonio National Park, Arenal Volcano, Monteverde Cloud Forest, and a country where 25% of land is protected national park.",th:["Manuel Antonio National Park","Arenal Volcano & hot springs","Monteverde Cloud Forest","Tortuguero sea turtle sanctuary"],econ:"Costa Rica's stable democracy, educated workforce, and eco-tourism economy is the model for what New PanAmerica proposes for the entire hemisphere.",eh:["Premium eco-tourism model","Tech nearshoring hub","99% renewable electricity","Stable democratic governance model"],s1:"99%",sl1:"Renewable Electricity",s2:"3.3M",sl2:"Annual Visitors"},
+  {id:10,x:37.34,y:42.87,hub:1,name:"Panama City",country:"Panama",tag:"Where Oceans Meet",tour:"The Panama Canal, Casco Viejo's UNESCO colonial heritage, San Blas Islands' indigenous Kuna paradise.",th:["Panama Canal & Miraflores Locks","Casco Viejo UNESCO district","San Blas Islands & Kuna culture","Biomuseo Frank Gehry building"],econ:"The critical chokepoint of hemispheric commerce. Railway integration creates a multimodal freight hub connecting canal maritime traffic to the continental rail corridor.",eh:["Panama Canal — 6% global trade","Multimodal freight hub","Financial services center","Darién Bypass northern terminus"],s1:"6%",sl1:"Global Trade Through Canal",s2:"2M",sl2:"Annual Visitors"},
+  {id:11,x:38.62,y:44.19,hub:0,name:"Darién Bypass",country:"Panama / Colombia",tag:"Engineering Achievement of the Century",tour:"The Darién Gap preserved as one of Earth's most biodiverse wildernesses. Passengers view primary jungle meeting the Pacific coast from the train window.",th:["Darién Gap wilderness viewing","Pacific coastal scenery","Kuna Yala indigenous territory","Biodiverse jungle eco-tours"],econ:"The over-water coastal bypass connecting Panama to Colombia without destroying the Darién ecosystem — the single most significant infrastructure achievement in New PanAmerica.",eh:["Continental connection completion","Darién wilderness preservation","Eco-tourism corridor creation","North-South trade route opening"],s1:"100km",sl1:"Gap Bypassed",s2:"1,300",sl2:"Bird Species Preserved"},
+  {id:12,x:39.53,y:45.41,hub:0,name:"Medellín",country:"Colombia",tag:"The City of Eternal Spring",tour:"Once the world's most dangerous city — now one of its most inspiring transformations. The Metrocable, coffee region tours, and extraordinary street art.",th:["Metrocable urban gondola system","Coffee Region day trips","Street art & Graffitour","Botanical Garden & flower festival"],econ:"Medellín's transformation from murder capital to innovation city is the most compelling proof of concept for everything New PanAmerica proposes.",eh:["Urban transformation proof of concept","Innovation & tech hub emergence","Coffee export corridor","Anti-cartel economic model"],s1:"95%",sl1:"Homicide Rate Reduction",s2:"3M",sl2:"Annual Visitors"},
+  {id:13,x:40.26,y:46.88,hub:1,name:"Bogotá",country:"Colombia",tag:"High Altitude, High Culture",tour:"The Gold Museum's pre-Columbian treasures, Monserrate mountain, La Candelaria colonial district, and a world-class culinary scene.",th:["Museo del Oro gold collection","Monserrate mountain sanctuary","La Candelaria colonial district","Andean cuisine & food tour"],econ:"Darién Bypass southern terminus — where the continental railway first touches South American soil. Natural home for the RWA platform's South American operations.",eh:["Darién Bypass South American terminus","RWA platform South American hub","Fintech startup ecosystem","Andean trade corridor anchor"],s1:"$110B",sl1:"Metro GDP",s2:"4M",sl2:"Annual Visitors"},
+  {id:14,x:39.53,y:49.32,hub:0,name:"Quito",country:"Ecuador",tag:"Capital at the Center of the World",tour:"Quito sits on the equator. UNESCO World Heritage colonial center, Galápagos Islands gateway, Amazon jungle day trips, and active volcanoes.",th:["UNESCO colonial historic center","Galápagos Islands gateway","Mitad del Mundo equator monument","Amazon jungle access"],econ:"Ecuador connects the Andean railway spine to Pacific coast ports and Amazon basin resources.",eh:["Galápagos eco-tourism gateway","Oil export diversification","Amazon resource corridor","Agricultural export hub"],s1:"$115B",sl1:"GDP",s2:"2.4M",sl2:"Annual Visitors"},
+  {id:15,x:39.35,y:53.22,hub:1,name:"Lima",country:"Peru",tag:"Gastronomic Capital of the Americas",tour:"Consistently ranked among the world's top food cities. The Larco Museum, Miraflores clifftop districts, and gateway to Machu Picchu.",th:["Machu Picchu gateway","Larco Museum Incan gold","Miraflores clifftop dining","Huacachina desert oasis"],econ:"Peru's mining wealth — copper, silver, gold — is a critical node in the hemispheric resource supply chain.",eh:["Copper & mineral export corridor","Machu Picchu tourism economy","Growing consumer market","Pacific port trade access"],s1:"$250B",sl1:"GDP",s2:"4.4M",sl2:"Annual Visitors"},
+  {id:16,x:40.81,y:55.18,hub:0,name:"Cusco / Machu Picchu",country:"Peru",tag:"Crown Jewel of the Land Cruise",tour:"Machu Picchu — the greatest archaeological site in the western hemisphere. The Sacred Valley, ancient Cusco, Rainbow Mountain, and the Inca Trail.",th:["Machu Picchu citadel","Sacred Valley & Pisac ruins","Rainbow Mountain hike","Cusco colonial city & San Pedro market"],econ:"Cusco's tourism economy generates $3B annually. Railway connection creates sustainable tourism growth distributing wealth to indigenous Quechua communities.",eh:["$3B annual tourism economy","Indigenous Quechua community wealth","Archaeological preservation funding","Sustainable heritage tourism model"],s1:"$3B",sl1:"Annual Tourism Revenue",s2:"1.5M",sl2:"Machu Picchu Annual Visitors"},
+  {id:17,x:42.28,y:56.88,hub:0,name:"La Paz / Potosí",country:"Bolivia",tag:"The Lithium Heart of the Hemisphere",tour:"The Salar de Uyuni — the world's largest salt flat. Potosí's historic silver mines, the world's highest capital city, and extraordinary Tiwanaku ruins.",th:["Salar de Uyuni salt flat","La Paz urban gondola system","Tiwanaku ancient ruins","Death Road cycling adventure"],econ:"Bolivia holds the world's largest lithium reserves — the critical resource for New PanAmerica's entire electric railway system.",eh:["World's largest lithium reserves","Lithium battery supply chain anchor","Salar de Uyuni tourism development","Landlocked nation connectivity solution"],s1:"23M tons",sl1:"Lithium Reserves",s2:"600K",sl2:"Annual Visitors"},
+  {id:18,x:41.36,y:65.92,hub:0,name:"Santiago",country:"Chile",tag:"Gateway to Atacama and Patagonia",tour:"Cerro San Cristóbal views, Barrio Italia design district, world-class wine from nearby valleys, gateway to the Atacama Desert and Patagonia.",th:["Atacama Desert gateway","Patagonia & Torres del Paine access","Barrio Italia design & food district","Chilean wine valley tours"],econ:"Chile is the world's largest copper producer and second largest lithium producer — the resource capital of the southern loop.",eh:["World's largest copper production","Second largest lithium reserves","Atacama-Brazil battery supply chain","Pacific port export gateway"],s1:"$310B",sl1:"GDP",s2:"4.5M",sl2:"Annual Visitors"},
+  {id:19,x:42.28,y:77.15,hub:0,name:"Patagonia",country:"Chile / Argentina",tag:"The End of the World",tour:"Torres del Paine National Park, Glacier Perito Moreno, the Strait of Magellan, penguin colonies, and landscapes that redefine what remote means.",th:["Torres del Paine trekking","Perito Moreno Glacier walk","Strait of Magellan crossing","Magellanic penguin colonies"],econ:"Patagonia generates premium eco-tourism revenue. As the land cruise's southern terminus, this is where the most expensive tickets are sold.",eh:["Premium eco-tourism southern terminus","Land cruise highest ticket revenue","Renewable wind energy generation","Antarctic research gateway"],s1:"2,000+",sl1:"km Torres del Paine Trails",s2:"800K",sl2:"Annual Park Visitors"},
+  {id:20,x:45.94,y:67.38,hub:1,name:"Buenos Aires",country:"Argentina",tag:"Paris of South America",tour:"Teatro Colón opera house, La Boca's colorful Caminito, San Telmo's antique market, world-renowned steak and Malbec.",th:["Teatro Colón opera house","La Boca & Caminito street art","San Telmo antique market","Patagonia gateway"],econ:"Río de la Plata Bridge southern terminus. Argentina's lithium reserves, agricultural wealth, and industrial capacity anchor the southern hemisphere system.",eh:["Río de la Plata Bridge terminus","Lithium & agricultural wealth","Bioceanic Corridor connection","Southern Cone trade hub"],s1:"$470B",sl1:"Metro GDP",s2:"7.4M",sl2:"Annual Visitors"},
+  {id:21,x:46.67,y:68.12,hub:1,name:"Montevideo",country:"Uruguay",tag:"The Río de la Plata Bridge Node",tour:"Colonial Old Town, the Rambla waterfront promenade, world-class beef and wine, and one of South America's most stable and safe societies.",th:["Ciudad Vieja colonial district","Rambla waterfront walk","Punta del Este beach resort","Mercado del Puerto food hall"],econ:"The Río de la Plata Bridge transforms Montevideo into a node connecting two continental economies. Uruguay's stable institutions make it ideal for NPA's financial compliance infrastructure.",eh:["Río de la Plata Bridge connection","Financial compliance hub","Low corruption governance model","Free trade zone infrastructure"],s1:"$75B",sl1:"GDP",s2:"3.4M",sl2:"Annual Visitors"},
+  {id:22,x:52.34,y:60.06,hub:1,name:"São Paulo",country:"Brazil",tag:"South America's Economic Engine",tour:"The Pinacoteca art museum, Vila Madalena street art, Liberdade Japanese neighborhood, Ibirapuera Park, and world-class Japanese cuisine.",th:["Ibirapuera Park & cultural complex","Vila Madalena street art","Liberdade Japanese neighborhood","MASP art museum"],econ:"São Paulo's $730B metro economy anchors the entire South American railway. Primary location for lithium battery manufacturing and automotive production.",eh:["Lithium battery manufacturing hub","Automotive & EV production center","South American financial capital","Bioceanic Corridor node"],s1:"$730B",sl1:"Metro GDP",s2:"15M",sl2:"Annual Visitors"},
+  {id:23,x:53.44,y:57.86,hub:0,name:"Rio de Janeiro",country:"Brazil",tag:"The Marvelous City",tour:"Christ the Redeemer, Copacabana and Ipanema beaches, Sugarloaf Mountain, Carnival, and a city that may be the most visually spectacular on Earth.",th:["Christ the Redeemer & Corcovado","Copacabana & Ipanema beaches","Sugarloaf Mountain cable car","Carnival & samba culture"],econ:"Rio's port connects the east coast loop to global shipping. Brazil's pre-salt oil fields and fintech sector make it the Atlantic corridor hub.",eh:["Pre-salt oil export gateway","Atlantic shipping connection","Fintech & startup ecosystem","Carnival & cultural IP economy"],s1:"$210B",sl1:"Metro GDP",s2:"6.7M",sl2:"Annual Visitors"},
+  {id:24,x:44.66,y:44.43,hub:0,name:"Caracas",country:"Venezuela",tag:"Caribbean Gateway to South America",tour:"Angel Falls — the world's highest waterfall — Gran Sabana tepuis, Canaima National Park, and the connection point between Caribbean and South American systems.",th:["Angel Falls world's highest","Canaima National Park","Gran Sabana tepuis","Caribbean coast beaches"],econ:"Venezuela's position and the Trinidad-Venezuela bridge crossing make it the critical link connecting Caribbean ferry routes to the South American continental railway.",eh:["Trinidad-Venezuela bridge node","Oil export corridor","Caribbean-South America link","Strategic mineral resources"],s1:"7 miles",sl1:"Trinidad Bridge Crossing",s2:"1.3B",sl2:"Oil Barrels in Reserve"},
+  {id:25,x:40.45,y:35.64,hub:0,name:"Havana",country:"Cuba",tag:"The Caribbean's Most Anticipated Opening",tour:"Old Havana's UNESCO colonial architecture, vintage American cars, son cubano and mojitos, Hemingway's haunts, and one of the world's most extraordinary preserved historic cities.",th:["Old Havana UNESCO colonial city","Vintage car culture","Hemingway sites & rum trails","Cuban music & dance scene"],econ:"Miami-Havana ferry connection is the most symbolically powerful infrastructure decision in New PanAmerica — the physical manifestation of hemispheric reconciliation.",eh:["Pent-up American tourism market","Caribbean luxury hotel development","Cultural IP economy activation","Hemispheric reconciliation symbol"],s1:"60 yrs",sl1:"U.S. Market Pent-Up Demand",s2:"4.7M",sl2:"Pre-Embargo Era Visitors"},
+  {id:26,x:46.49,y:44.19,hub:0,name:"Port of Spain",country:"Trinidad & Tobago",tag:"Caribbean Connection to South America",tour:"Trinidad Carnival — the world's greatest street festival. Tobago's pristine reefs, steel pan music's birthplace, and extraordinary Caribbean food culture.",th:["Trinidad Carnival","Tobago coral reef diving","Steel pan music culture","Pitch Lake natural wonder"],econ:"The 7-mile Trinidad-Venezuela crossing is the most buildable Caribbean fixed link — connecting the eastern Caribbean island arc to South America's continental railway.",eh:["Trinidad-Venezuela bridge terminus","Eastern Caribbean ferry hub","Natural gas & energy export","Caribbean railway anchor"],s1:"7 miles",sl1:"Trinidad-Venezuela Crossing",s2:"400K",sl2:"Annual Visitors"},
+  {id:27,x:39.90,y:43.95,hub:0,name:"Cartagena",country:"Colombia",tag:"The Caribbean's Crown Jewel",tour:"Cartagena's UNESCO-listed walled city, Castillo San Felipe fortress, the vibrant Getsemaní neighborhood, and Caribbean beaches minutes from the historic center.",th:["Walled Old City UNESCO heritage","Castillo San Felipe de Barajas","Rosario Islands Caribbean beaches","Getsemaní street art & culture"],econ:"Cartagena connects the Pan-American Railway to Caribbean ferry routes and the Atlantic shipping lane. One of the framework's highest-value RWA real estate opportunities.",eh:["Caribbean ferry network connection","Station district RWA development","Atlantic shipping connection","Colonial heritage tourism economy"],s1:"$15B",sl1:"Annual Tourism Potential",s2:"1.5M",sl2:"Annual Visitors"}
+];
+
+var ROUTES=[
+  {pts:[[39.53,35.16],[41.5,32.2],[43.01,28.81],[44.29,25.39],[44.8,22.5],[43.5,20],[41,18.5],[38.80,24.90]],s:'main'},
+  {pts:[[39.53,35.16],[37,34],[36.05,31.74],[34,30.5],[31.84,29.30],[30,27],[29,25],[30,22],[32,20],[35,19],[38.80,24.90]],s:'main'},
+  {pts:[[39.53,35.16],[37,36.5],[35.14,37.11],[36.24,38.09],[35.69,39.06],[36.05,40.04],[36.24,41.02],[36.79,41.89],[37.34,42.87]],s:'main'},
+  {pts:[[37.34,42.87],[38.62,44.19],[39.53,45.41],[40.26,46.88]],s:'bypass'},
+  {pts:[[40.26,46.88],[39.90,43.95]],s:'main'},
+  {pts:[[40.26,46.88],[39.53,49.32],[39.35,53.22],[40.81,55.18],[42.28,56.88],[41.8,62],[41.36,65.92],[41.8,71],[42.28,77.15]],s:'main'},
+  {pts:[[40.26,46.88],[44.66,44.43],[46.49,44.19],[46.85,49.32],[51.24,55.18],[52.34,60.06],[53.44,57.86],[52,63],[49.27,65],[45.94,67.38],[46.67,68.12]],s:'main'},
+  {pts:[[45.94,67.38],[46.67,68.12]],s:'bridge'},
+  {pts:[[45.94,67.38],[43,70],[42.28,77.15]],s:'main'},
+  {pts:[[39.53,35.16],[40.45,35.64]],s:'ferry'},
+  {pts:[[40.45,35.64],[43,37],[46.49,44.19]],s:'ferry'},
+  {pts:[[46.49,44.19],[44.66,44.43]],s:'ferry'}
+];
+
+var img=document.getElementById('mapImg'),
+    svg=document.getElementById('routeSvg'),
+    rg=document.getElementById('rg'),
+    ml=document.getElementById('ml'),
+    outer=document.getElementById('outer'),
+    inner=document.getElementById('inner');
+
+function p2x(p,s){return (p/100)*s;}
+
+function drawRoutes(iw,ih){
+  rg.innerHTML='';
+  ROUTES.forEach(function(r){
+    var pts=r.pts.map(function(p){return p2x(p[0],iw)+','+p2x(p[1],ih);}).join(' ');
+    var gc=r.s==='ferry'?'#7ECBA8':r.s==='bridge'?'#F5E6B8':'#C9A84C';
+    var gw=r.s==='bridge'?12:9;
+    var G=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    G.setAttribute('points',pts);G.setAttribute('fill','none');
+    G.setAttribute('stroke',gc);G.setAttribute('stroke-width',gw);
+    G.setAttribute('opacity','0.1');G.setAttribute('stroke-linecap','round');G.setAttribute('stroke-linejoin','round');
+    rg.appendChild(G);
+    var L=document.createElementNS('http://www.w3.org/2000/svg','polyline');
+    L.setAttribute('points',pts);L.setAttribute('fill','none');
+    L.setAttribute('stroke',gc);
+    L.setAttribute('stroke-width',r.s==='bridge'?4:r.s==='ferry'?2:3);
+    L.setAttribute('opacity',r.s==='ferry'?'0.65':r.s==='bridge'?'1':'0.92');
+    L.setAttribute('stroke-linecap','round');L.setAttribute('stroke-linejoin','round');
+    if(r.s==='bypass')L.setAttribute('stroke-dasharray','10,6');
+    if(r.s==='ferry')L.setAttribute('stroke-dasharray','5,9');
+    rg.appendChild(L);
+  });
+  addLbl(rg,p2x(38.2,iw),p2x(44.2,ih),'DARIÉN BYPASS','#C9A84C');
+  addLbl(rg,p2x(43.5,iw),p2x(67.0,ih),'RÍO DE LA PLATA BRIDGE','#F5E6B8');
+}
+
+function addLbl(parent,x,y,txt,col){
+  var t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('fill',col);
+  t.setAttribute('font-family',"'Bebas Neue',sans-serif");t.setAttribute('font-size','11');
+  t.setAttribute('letter-spacing','1.5');t.setAttribute('opacity','0.9');
+  t.textContent=txt;parent.appendChild(t);
+}
+
+function placeMarkers(iw,ih){
+  ml.innerHTML='';
+  S.forEach(function(s){
+    var d=document.createElement('div');
+    d.className='marker'+(s.hub?' hub':'');
+    d.style.left=(p2x(s.x,iw))+'px';
+    d.style.top=(p2x(s.y,ih))+'px';
+    var dot=document.createElement('div');dot.className='marker-dot';
+    var lbl=document.createElement('div');lbl.className='marker-label';lbl.textContent=s.name.toUpperCase();
+    d.appendChild(dot);d.appendChild(lbl);
+    d.addEventListener('click',function(e){e.stopPropagation();openPopup(s,d);});
+    ml.appendChild(d);
+  });
+}
+
+function setup(){
+  var iw=img.naturalWidth,ih=img.naturalHeight;
+  img.style.width=iw+'px';img.style.height=ih+'px';
+  svg.setAttribute('width',iw);svg.setAttribute('height',ih);
+  svg.style.width=iw+'px';svg.style.height=ih+'px';
+  ml.style.width=iw+'px';ml.style.height=ih+'px';
+  drawRoutes(iw,ih);placeMarkers(iw,ih);fitMap();
+}
+
+if(img.complete&&img.naturalWidth>0){setup();}else{img.onload=setup;img.onerror=function(){document.getElementById('loadMsg').style.display='block';document.getElementById('loadMsg').textContent='Place npa-map.png in the same folder as this HTML file.'};}
+
+var scale=1,tx=0,ty=0,drag=false,sx,sy,stx,sty;
+function applyT(){inner.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')';inner.style.transformOrigin='0 0';}
+function fitMap(){if(!img.naturalWidth)return;var ow=outer.clientWidth,oh=outer.clientHeight,iw=img.naturalWidth,ih=img.naturalHeight,s=Math.min(ow/iw,oh/ih)*0.95;scale=s;tx=(ow-iw*s)/2;ty=(oh-ih*s)/2;applyT();}
+window.addEventListener('resize',fitMap);
+outer.addEventListener('mousedown',function(e){if(e.target.classList.contains('marker-dot')||e.target.closest('.marker'))return;drag=true;sx=e.clientX;sy=e.clientY;stx=tx;sty=ty;outer.classList.add('grabbing');});
+document.addEventListener('mousemove',function(e){if(!drag)return;tx=stx+(e.clientX-sx);ty=sty+(e.clientY-sy);applyT();});
+document.addEventListener('mouseup',function(){drag=false;outer.classList.remove('grabbing');});
+outer.addEventListener('wheel',function(e){e.preventDefault();var r=outer.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top,d=e.deltaY>0?0.85:1.18,ns=Math.max(0.3,Math.min(10,scale*d));tx=mx-(mx-tx)*(ns/scale);ty=my-(my-ty)*(ns/scale);scale=ns;applyT();},{passive:false});
+document.getElementById('zIn').onclick=function(){var cx=outer.clientWidth/2,cy=outer.clientHeight/2,ns=Math.min(10,scale*1.3);tx=cx-(cx-tx)*(ns/scale);ty=cy-(cy-ty)*(ns/scale);scale=ns;applyT();};
+document.getElementById('zOut').onclick=function(){var cx=outer.clientWidth/2,cy=outer.clientHeight/2,ns=Math.max(0.3,scale/1.3);tx=cx-(cx-tx)*(ns/scale);ty=cy-(cy-ty)*(ns/scale);scale=ns;applyT();};
+document.getElementById('zFit').onclick=fitMap;
+
+var popup=document.getElementById('popup');
+window.showTab=function(i){document.getElementById('tTour').classList.toggle('on',i===0);document.getElementById('tEcon').classList.toggle('on',i===1);document.getElementById('pTour').classList.toggle('on',i===0);document.getElementById('pEcon').classList.toggle('on',i===1);};
+
+function openPopup(s,el){
+  document.getElementById('pBadge').textContent=s.hub?'Major Hub':'Station Stop';
+  document.getElementById('pCity').textContent=s.name;
+  document.getElementById('pTag').textContent=s.tag;
+  document.getElementById('pTourTxt').textContent=s.tour;
+  document.getElementById('pEconTxt').textContent=s.econ;
+  document.getElementById('pTourList').innerHTML=s.th.map(function(h){return '<li>'+h+'</li>';}).join('');
+  document.getElementById('pEconList').innerHTML=s.eh.map(function(h){return '<li>'+h+'</li>';}).join('');
+  document.getElementById('pS1n').textContent=s.s1;document.getElementById('pS1l').textContent=s.sl1;
+  document.getElementById('pS2n').textContent=s.s2;document.getElementById('pS2l').textContent=s.sl2;
+  showTab(0);
+  var or=outer.getBoundingClientRect(),dr=el.getBoundingClientRect();
+  var px=dr.left-or.left+dr.width/2,py=dr.top-or.top;
+  var pw=310,left=px+14,top=py-60+54;
+  if(left+pw>outer.clientWidth-8)left=px-pw-14;
+  if(top+350>window.innerHeight-8)top=window.innerHeight-360;
+  if(top<62)top=62;if(left<8)left=8;
+  popup.style.left=left+'px';popup.style.top=top+'px';popup.classList.add('open');
+  document.querySelectorAll('.marker').forEach(function(m){m.classList.remove('active');});
+  el.classList.add('active');
+}
+document.getElementById('popX').onclick=function(){popup.classList.remove('open');document.querySelectorAll('.marker').forEach(function(m){m.classList.remove('active');});};
+outer.addEventListener('click',function(e){if(!e.target.closest('.marker')&&!e.target.closest('.popup'))popup.classList.remove('open');});
+</script>
+  
   <div class="railway-cities">
     <div class="city-stop"><div class="city-dot"></div><div class="city-name">MIAMI</div></div>
     <div class="city-stop"><div class="city-dot"></div><div class="city-name">HAVANA</div></div>
